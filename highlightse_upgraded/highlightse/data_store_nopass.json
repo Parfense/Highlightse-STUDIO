@@ -1,0 +1,119 @@
+{
+  "users": [
+    {
+      "username": "teacher1",
+      "first_name": "Александр",
+      "last_name": "Волков",
+      "dob": "1988-05-15",
+      "role": "teacher"
+    },
+    {
+      "username": "teacher2",
+      "first_name": "Елена",
+      "last_name": "Соколова",
+      "dob": "1988-05-15",
+      "role": "teacher"
+    },
+    {
+      "username": "teacher3",
+      "first_name": "Михаил",
+      "last_name": "Морозов",
+      "dob": "1988-05-15",
+      "role": "teacher"
+    },
+    {
+      "username": "teacher4",
+      "first_name": "Ольга",
+      "last_name": "Новикова",
+      "dob": "1988-05-15",
+      "role": "teacher"
+    },
+    {
+      "username": "teacher5",
+      "first_name": "Дмитрий",
+      "last_name": "Лебедев",
+      "dob": "1988-05-15",
+      "role": "teacher"
+    },
+    {
+      "username": "teacher6",
+      "first_name": "Анна",
+      "last_name": "Козлова",
+      "dob": "1988-05-15",
+      "role": "teacher"
+    },
+    {
+      "username": "teacher7",
+      "first_name": "Сергей",
+      "last_name": "Павлов",
+      "dob": "1988-05-15",
+      "role": "teacher"
+    },
+    {
+      "username": "teacher8",
+      "first_name": "Наталья",
+      "last_name": "Семенова",
+      "dob": "1988-05-15",
+      "role": "teacher"
+    },
+    {
+      "username": "teacher9",
+      "first_name": "Андрей",
+      "last_name": "Голубев",
+      "dob": "1988-05-15",
+      "role": "teacher"
+    },
+    {
+      "username": "teacher10",
+      "first_name": "Татьяна",
+      "last_name": "Виноградова",
+      "dob": "1988-05-15",
+      "role": "teacher"
+    },
+    {
+      "username": "student_demo",
+      "first_name": "Иван",
+      "last_name": "Смирнов",
+      "dob": "2008-09-12",
+      "role": "student"
+    }
+  ],
+  "documents": [
+    {
+      "id": 1,
+      "owner": "student_demo",
+      "author_name": "Иван Смирнов",
+      "title": "Исследование экосистем и биотехнологий",
+      "font": "Montserrat",
+      "updated": "Сегодня, 14:30",
+      "content": "<p><span style='font-size: 28px; font-family: Montserrat;'><b>Зелёная архитектура будущего</b></span></p><p>Современные текстовые процессоры сочетают <span class='highlight-pen'>чистоту листа бумаги</span> и мощные инструменты типографики: от <i>классического Garamond</i> до геометрической <b>Futura</b>.</p><div class='custom-check-item checked' contenteditable='false'><button class='check-box-btn' onclick='toggleCheck(this)'><svg viewBox='0 0 24 24'><polyline points='20 6 9 17 4 12'></polyline></svg></button><span class='check-label' contenteditable='true'>Протестировать 6 шрифтов (Helvetica, Futura, Roboto, Montserrat, Garamond, Times New Roman)</span></div><div class='custom-check-item' contenteditable='false'><button class='check-box-btn' onclick='toggleCheck(this)'><svg viewBox='0 0 24 24'><polyline points='20 6 9 17 4 12'></polyline></svg></button><span class='check-label' contenteditable='true'>Попробовать размер шрифта от 5px до 72px и жёлтый выделитель</span></div>"
+    },
+    {
+      "id": 2,
+      "owner": "student_demo",
+      "author_name": "Иван Смирнов",
+      "title": "Заметки по дизайну и типографике",
+      "font": "Garamond",
+      "updated": "Вчера, 19:15",
+      "content": "<p><span style='font-size: 24px; font-family: Garamond;'><b>Искусство шрифта</b></span></p><p>Выделите любой абзац мышкой и выберите <span class='highlight-pen'>любой из 6 шрифтов</span> на верхней панели Word-редактора. Также можно зачеркнуть <s>черновые мысли</s> и оставить только главное.</p>"
+    },
+    {
+      "id": 3,
+      "owner": "teacher1",
+      "author_name": "Александр Волков",
+      "title": "Новый документ Word",
+      "font": "Montserrat",
+      "updated": "Сохранено в 19:21:25",
+      "content": "<p><span style=\"font-size: 22px;\">тмитм<b><i><strike>имими</strike></i></b></span><b><i><strike>т<span style=\"font-size: 72px;\"><span style=\"font-size: 67px;\"><span style=\"font-size: 60px;\"><span style=\"font-size: 57px;\"><span style=\"font-size: 54px;\"><span style=\"font-size: 52px;\"><span style=\"font-size: 53px;\"><span style=\"font-size: 54px;\"><span style=\"font-size: 56px;\"><span style=\"font-size: 60px;\"><span style=\"font-size: 66px;\"><span style=\"font-size: 70px;\">и</span></span></span></span></span></span></span></span></span></span></span></span><span class=\"highlight-pen\"><span style=\"font-size: 72px;\"><span style=\"font-size: 67px;\"><span style=\"font-size: 60px;\"><span style=\"font-size: 57px;\"><span style=\"font-size: 54px;\"><span style=\"font-size: 52px;\"><span style=\"font-size: 53px;\"><span style=\"font-size: 54px;\"><span style=\"font-size: 56px;\"><span style=\"font-size: 60px;\"><span style=\"font-size: 66px;\"><span style=\"font-size: 70px;\">м</span></span></span></span></span></span></span></span></span></span></span></span>и</span></strike></i></b></p>\n                \n                "
+    },
+    {
+      "id": 4,
+      "owner": "teacher1",
+      "author_name": "Александр Волков",
+      "title": "Новый документ Word",
+      "font": "Montserrat",
+      "updated": "Создано в 19:21:02",
+      "content": "<p>Чистый лист готов к работе. Выберите шрифт, размер от 5 до 72px или выделите мысль маркером...</p>"
+    }
+  ]
+}
