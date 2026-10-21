@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Highlightse 3D — Умное пространство для учёбы</title>
+<style>
+:root {
+    --bg-main: #f0f4f8;
+    --bg-card: rgba(255, 255, 255, 0.88);
+    --bg-surface: #ffffff;
+    --text-primary: #1e293b;
+    --text-muted: #64748b;
+    --accent: #6366f1;
+    --accent-hover: #4f46e5;
+    --border-color: rgba(226, 232, 240, 0.9);
+    --shadow-3d: 0 20px 35px -10px rgba(15, 23, 42, 0.12), 0 8px 15px -6px rgba(15, 23, 42, 0.06);
+    --highlight-bg: linear-gradient(120deg, #fef08a 0%, #fde047 100%);
+    --highlight-shadow: 0 3px 10px rgba(250, 204, 21, 0.35);
+}
+
+[data-theme="dark"] {
+    --bg-main: #0f172a;
+    --bg-card: rgba(30, 41, 59, 0.88);
+    --bg-surface: #1e293b;
+    --text-primary: #f8fafc;
+    --text-muted: #94a3b8;
+    --accent: #818cf8;
+    --accent-hover: #6366f1;
+    --border-color: rgba(51, 65, 85, 0.8);
+    --shadow-3d: 0 25px 40px -12px rgba(0, 0, 0, 0.6);
+    --highlight-bg: linear-gradient(120deg, #fde047 0%, #facc15 100%);
+    --highlight-shadow: 0 3px 12px rgba(250, 204, 21, 0.25);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+/* 🧊 3D Фоновые плавающие фигуры */
+.scene-3d-bg {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: -1;
+    perspective: 1000px;
+    overflow: hidden;
+}
+
+.floating-cube, .floating-sphere {
+    position: absolute;
+    border-radius: 24px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.22), rgba(250, 204, 21, 0.22));
+    backdrop-filter: blur(8px);
+    box-shadow: inset 0 0 20px rgba(255,255,255,0.3);
+    animation: float3d 12s infinite ease-in-out alternate;
+}
+
+.cube-1 { width: 180px; height: 180px; top: 8%; left: 5%; }
+.cube-2 { width: 130px; height: 130px; bottom: 10%; right: 8%; animation-delay: -4s; }
+.sphere-1 { width: 220px; height: 220px; border-radius: 50%; top: 55%; left: 75%; animation-delay: -7s; }
+
+@keyframes float3d {
+    0% { transform: translateZ(0) translateY(0) rotateX(0deg) rotateY(0deg); }
+    100% { transform: translateZ(60px) translateY(-35px) rotateX(25deg) rotateY(35deg); }
+}
+
+/* 🖍️ Выделитель с плавным жёлтым фоном и округлёнными краями */
+.highlight-pen {
+    background: var(--highlight-bg);
+    color: #111827 !important;
+    padding: 3px 9px;
+    margin: 0 2px;
+    border-radius: 8px;
+    box-shadow: var(--highlight-shadow);
+    font-weight: 500;
+    display: inline;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
+}
+
+.highlight-pen:hover {
+    filter: brightness(1.04);
+    box-shadow: 0 5px 14px rgba(250, 204, 21, 0.55);
+}
+
+/* 🧊 3D Карточки */
+.card-3d {
+    background: var(--bg-card);
+    backdrop-filter: blur(14px);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    box-shadow: var(--shadow-3d);
+    transform-style: preserve-3d;
+    transition: transform 0.25s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.3s ease, background-color 0.4s ease;
+}
+
+/* ✨ Красивые анимации кнопок и переключателей */
+.btn-3d {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    font-weight: 600;
+    font-size: 0.92rem;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.btn-3d:hover {
+    transform: translateY(-3px) scale(1.02);
+}
+
+.btn-3d:active {
+    transform: translateY(1px) scale(0.97);
+}
+
+.btn-primary {
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.35);
+}
+
+.btn-secondary {
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.btn-highlighter {
+    background: linear-gradient(135deg, #fde047, #facc15);
+    color: #1e293b;
+    box-shadow: 0 6px 15px rgba(250, 204, 21, 0.4);
+}
+
+.btn-ghost {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border-color);
+}
+
+.btn-small {
+    padding: 6px 12px;
+    font-size: 0.82rem;
+    background: var(--accent);
+    color: #fff;
+}
+
+/* Тумблер тёмной темы */
+.theme-switch {
+    position: relative;
+    display: inline-block;
+    width: 62px;
+    height: 32px;
+}
+
+.theme-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 7px;
+    font-size: 14px;
+    transition: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.slider::before {
+    content: "";
+    position: absolute;
+    height: 24px;
+    width: 24px;
+    left: 4px;
+    bottom: 3px;
+    background: var(--accent);
+    border-radius: 50%;
+    transition: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 1;
+}
+
+.theme-switch input:checked + .slider::before {
+    transform: translateX(29px);
+}
+
+/* Навигация и шапка */
+.navbar, .app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 36px;
+    background: var(--bg-card);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+}
+
+.logo {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.badge-3d {
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.7rem;
+    padding: 2px 7px;
+    border-radius: 6px;
+    transform: translateY(-2px);
+}
+
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+/* Вкладки разделов */
+.view-tabs {
+    display: flex;
+    background: var(--bg-main);
+    padding: 4px;
+    border-radius: 14px;
+    gap: 6px;
+}
+
+.tab-btn {
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.tab-btn.active {
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.counter {
+    background: var(--accent);
+    color: #fff;
+    padding: 1px 6px;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    margin-left: 4px;
+}
+
+/* 💾 Индикатор автосохранения */
+.save-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 99px;
+    font-size: 0.83rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.save-badge.saving {
+    background: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+}
+.save-badge.saving .status-dot {
+    background: #f59e0b;
+    animation: pulse 0.9s infinite alternate;
+}
+
+.save-badge.saved {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+}
+.save-badge.saved .status-dot {
+    background: #10b981;
+}
+
+@keyframes pulse {
+    from { transform: scale(0.8); opacity: 0.5; }
+    to { transform: scale(1.4); opacity: 1; }
+}
+
+/* Секции и сетка */
+.view-section {
+    display: none;
+    padding: 28px 36px;
+    max-width: 1440px;
+    margin: 0 auto;
+    animation: fadeIn 0.35s ease;
+}
+
+.view-section.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.workspace-grid {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 24px;
+    min-height: 75vh;
+}
+
+/* 📚 Библиотека документов */
+.library-panel {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    outline: none;
+}
+
+.doc-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.card-3d-mini {
+    padding: 14px;
+    border-radius: 14px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.card-3d-mini:hover {
+    transform: translateY(-3px) rotateX(3deg);
+    border-color: var(--accent);
+}
+
+.card-3d-mini.active {
+    border-left: 4px solid var(--accent);
+    background: rgba(99, 102, 241, 0.08);
+}
+
+.doc-meta {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+}
+
+/* Редактор */
+.editor-panel {
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.editor-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.doc-title-input {
+    font-size: 1.5rem;
+    font-weight: 700;
+    border: none;
+    background: transparent;
+    color: var(--text-primary);
+    outline: none;
+    flex: 1;
+}
+
+.toolbar-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.editor-surface {
+    flex: 1;
+    min-height: 420px;
+    font-size: 1.1rem;
+    line-height: 1.75;
+    padding: 20px;
+    border-radius: 14px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    outline: none;
+}
+
+/* 👨‍🏫 Кабинет учителя */
+.teacher-header {
+    margin-bottom: 24px;
+}
+
+.submissions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 24px;
+}
+
+.submission-card {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.sub-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.student-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.student-avatar {
+    font-size: 2rem;
+}
+
+.sub-time {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+
+.status-pill {
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 99px;
+}
+
+.status-pending {
+    background: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+}
+
+.status-done {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+}
+
+.sub-preview {
+    background: var(--bg-surface);
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.sub-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+    padding-top: 10px;
+}
+
+.grade-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-grade {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.btn-grade:hover {
+    transform: translateY(-2px) scale(1.08);
+    border-color: var(--accent);
+}
+
+.btn-grade.selected {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+}
+
+/* Главная страница (Hero) */
+.hero-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 82vh;
+    padding: 24px;
+}
+
+.hero-card {
+    max-width: 720px;
+    padding: 48px;
+    text-align: center;
+}
+
+.hero-badge {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 99px;
+    background: rgba(99, 102, 241, 0.12);
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 0.85rem;
+    margin-bottom: 18px;
+}
+
+.hero-card h1 {
+    font-size: 2.6rem;
+    line-height: 1.25;
+    margin-bottom: 18px;
+}
+
+.hero-subtitle {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 32px;
+}
+
+.hero-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.page { display: none; }
+.page.active { display: block; }
+</style>
+</head>
+<body class="landing-body">
+
+<div class="scene-3d-bg">
+  <div class="floating-cube cube-1"></div>
+  <div class="floating-sphere sphere-1"></div>
+  <div class="floating-cube cube-2"></div>
+</div>
+
+<!-- ============ ГЛАВНАЯ ============ -->
+<div id="page-landing" class="page active">
+  <nav class="navbar">
+    <div class="logo"><span class="logo-icon">🖍️</span> Highlightse <span class="badge-3d">3D</span></div>
+    <div class="nav-actions">
+      <label class="theme-switch" title="Переключить тему">
+        <input type="checkbox" class="theme-checkbox">
+        <span class="slider"><span class="icon-sun">☀️</span><span class="icon-moon">🌙</span></span>
+      </label>
+    </div>
+  </nav>
+
+  <section class="hero-container">
+    <div class="hero-card card-3d" data-tilt>
+      <div class="hero-badge">Новое поколение редакторов ✨</div>
+      <h1>Выделяй главное в <span class="highlight-pen">объёмном 3D</span> пространстве</h1>
+      <p class="hero-subtitle">Интерактивный редактор с мягким маркером, мгновенным автосохранением, удобной библиотекой и отдельным кабинетом для преподавателей.</p>
+      <div class="hero-buttons">
+        <a href="#app" class="btn-3d btn-primary">🚀 Открыть рабочее пространство</a>
+        <a href="#teacher" class="btn-3d btn-secondary">👨‍🏫 Кабинет учителя</a>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ============ ПРИЛОЖЕНИЕ ============ -->
+<div id="page-app" class="page">
+  <header class="app-header">
+    <a href="#" class="logo"><span class="logo-icon">🖍️</span> Highlightse <span class="badge-3d">PRO</span></a>
+
+    <div class="view-tabs">
+      <button class="tab-btn active" data-target="workspace-view">📚 Библиотека и Редактор</button>
+      <button class="tab-btn" data-target="teacher-view">👨‍🏫 Кабинет учителя <span class="counter" id="sub-counter">0</span></button>
+    </div>
+
+    <div class="header-controls">
+      <div id="save-indicator" class="save-badge saved">
+        <span class="status-dot"></span>
+        <span id="save-text">Сохранено в браузере</span>
+      </div>
+      <label class="theme-switch" title="Переключить тему">
+        <input type="checkbox" class="theme-checkbox">
+        <span class="slider"><span class="icon-sun">☀️</span><span class="icon-moon">🌙</span></span>
+      </label>
+    </div>
+  </header>
+
+  <main id="workspace-view" class="view-section active">
+    <div class="workspace-grid">
+      <aside class="library-panel card-3d">
+        <div class="panel-header">
+          <h2>📚 Библиотека</h2>
+          <button id="new-doc-btn" class="btn-3d btn-small">+ Новый</button>
+        </div>
+        <div class="search-box">
+          <input type="text" id="doc-search" placeholder="🔍 Поиск документов...">
+        </div>
+        <div id="doc-list" class="doc-list"></div>
+      </aside>
+
+      <section class="editor-panel card-3d">
+        <div class="editor-toolbar">
+          <input type="text" id="doc-title-input" class="doc-title-input" value="">
+          <div class="toolbar-actions">
+            <button id="btn-highlight" class="btn-3d btn-highlighter" title="Выделите текст мышкой и нажмите">🖍️ Выделить жёлтым</button>
+            <button id="btn-clear-highlight" class="btn-3d btn-ghost" title="Убрать выделение с текста">🧹 Очистить маркер</button>
+          </div>
+        </div>
+        <div id="document-editor" class="editor-surface" contenteditable="true"></div>
+      </section>
+    </div>
+  </main>
+
+  <main id="teacher-view" class="view-section">
+    <div class="teacher-header">
+      <div>
+        <h2>👨‍🏫 Работы учеников</h2>
+        <p class="text-muted">Проверяйте ключевые мысли, выделенные маркером, и выставляйте оценки в один клик.</p>
+      </div>
+    </div>
+    <div class="submissions-grid" id="submissions-grid"></div>
+  </main>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ---------- Данные по умолчанию ----------
+  const DEFAULT_DOCS = [
+    { id: 1, title: "Конспект по квантовой физике", category: "Наука", updated: "Сегодня, 14:20",
+      content: "Квантовая механика описывает природу на уровне атомов. <span class='highlight-pen'>Принцип неопределённости Гейзенберга</span> гласит, что невозможно одновременно точно измерить координату и импульс частицы. Выделите любой текст и нажмите на кнопку маркера выше!" },
+    { id: 2, title: "Архитектура веб-приложений", category: "IT & Разработка", updated: "Вчера, 19:05",
+      content: "Современный фронтенд активно использует <span class='highlight-pen'>3D-трансформации и микроанимации</span> для улучшения пользовательского опыта (UX). Автосохранение позволяет не терять важные мысли в процессе работы." },
+    { id: 3, title: "Эссе: Будущее образования", category: "Литература", updated: "12 мая",
+      content: "Интерактивные платформы объединяют учеников и преподавателей. Учитель сразу видит <span class='highlight-pen'>ключевые тезисы, выделенные маркером</span>, и может быстро оставить обратную связь." }
+  ];
+  const DEFAULT_SUBS = [
+    { id: 101, student: "Алексей Смирнов", avatar: "👨‍🎓", title: "Лабораторная работа: Оптика", submitted_at: "10 мин назад", status: "На проверке", grade: "",
+      excerpt: "При прохождении света через призму наблюдается <span class='highlight-pen'>дисперсия света — разложение в спектр</span> из-за разной скорости волн." },
+    { id: 102, student: "Мария Иванова", avatar: "👩‍🎓", title: "Анализ романа «Мастер и Маргарита»", submitted_at: "2 часа назад", status: "Проверено", grade: "5",
+      excerpt: "Булгаков использует приём «романа в романе», где <span class='highlight-pen'>тема совести и трусости</span> раскрывается через образ Понтия Пилата." },
+    { id: 103, student: "Дмитрий Соколов", avatar: "🧑‍💻", title: "Алгоритмы сортировки на Python", submitted_at: "Вчера", status: "На проверке", grade: "",
+      excerpt: "Быстрая сортировка (QuickSort) имеет среднюю сложность <span class='highlight-pen'>O(n log n)</span> и работает по принципу «разделяй и властвуй»." }
+  ];
+
+  // ---------- Хранилище (безопасно, даже если localStorage недоступен) ----------
+  function load(key, fallback) {
+    try {
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : JSON.parse(JSON.stringify(fallback));
+    } catch (e) { return JSON.parse(JSON.stringify(fallback)); }
+  }
+  function save(key, val) {
+    try { localStorage.setItem(key, JSON.stringify(val)); return true; } catch (e) { return false; }
+  }
+
+  let docs = load('highlightse_docs_v1', DEFAULT_DOCS);
+  let subs = load('highlightse_subs_v1', DEFAULT_SUBS);
+  let currentId = docs.length ? docs[0].id : null;
+
+  // ---------- Элементы ----------
+  const $ = (id) => document.getElementById(id);
+  const editor = $('document-editor'), titleInput = $('doc-title-input');
+  const indicator = $('save-indicator'), saveText = $('save-text');
+  const docList = $('doc-list'), grid = $('submissions-grid');
+
+  // ---------- 3D-наклон ----------
+  function bindTilt(el) {
+    if (el._tilt) return; el._tilt = true;
+    el.addEventListener('mousemove', (e) => {
+      const r = el.getBoundingClientRect();
+      const x = e.clientX - r.left, y = e.clientY - r.top;
+      const rx = ((y - r.height / 2) / (r.height / 2)) * -5;
+      const ry = ((x - r.width / 2) / (r.width / 2)) * 5;
+      el.style.transform = `perspective(1000px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-3px)`;
+    });
+    el.addEventListener('mouseleave', () => {
+      el.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0)';
+    });
+  }
+
+  // ---------- Тема ----------
+  const themeBoxes = document.querySelectorAll('.theme-checkbox');
+  function applyTheme(dark) {
+    if (dark) document.documentElement.setAttribute('data-theme', 'dark');
+    else document.documentElement.removeAttribute('data-theme');
+    themeBoxes.forEach(b => b.checked = dark);
+  }
+  let savedTheme = 'light';
+  try { savedTheme = localStorage.getItem('highlightse_theme') || 'light'; } catch (e) {}
+  applyTheme(savedTheme === 'dark');
+  themeBoxes.forEach(b => b.addEventListener('change', (e) => {
+    applyTheme(e.target.checked);
+    try { localStorage.setItem('highlightse_theme', e.target.checked ? 'dark' : 'light'); } catch (err) {}
+  }));
+
+  // ---------- Рендер библиотеки ----------
+  function esc(s) { return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+  function renderDocList() {
+    const q = ($('doc-search').value || '').toLowerCase();
+    docList.innerHTML = '';
+    docs.forEach(d => {
+      const item = document.createElement('div');
+      item.className = 'doc-item card-3d-mini' + (d.id === currentId ? ' active' : '');
+      item.dataset.id = d.id;
+      item.setAttribute('data-tilt', '');
+      item.innerHTML = `<div class="doc-meta">${esc(d.category)} • <span>${esc(d.updated)}</span></div>
+                        <h4 class="doc-item-title">${esc(d.title)}</h4>`;
+      if (q && !d.title.toLowerCase().includes(q)) item.style.display = 'none';
+      item.addEventListener('click', () => openDoc(d.id));
+      bindTilt(item);
+      docList.appendChild(item);
+    });
+  }
+
+  function openDoc(id) {
+    const d = docs.find(x => x.id === id);
+    if (!d) return;
+    currentId = id;
+    titleInput.value = d.title;
+    editor.innerHTML = d.content;
+    renderDocList();
+  }
+
+  // ---------- Автосохранение ----------
+  let saveTimeout;
+  function triggerAutoSave() {
+    indicator.className = 'save-badge saving';
+    saveText.textContent = 'Сохранение...';
+    clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(() => {
+      const d = docs.find(x => x.id === currentId);
+      if (d) {
+        d.title = titleInput.value || 'Без названия';
+        d.content = editor.innerHTML;
+        d.updated = 'Только что';
+      }
+      const ok = save('highlightse_docs_v1', docs);
+      if (ok) {
+        const t = new Date().toLocaleTimeString('ru-RU');
+        indicator.className = 'save-badge saved';
+        saveText.textContent = `Сохранено в ${t} ✨`;
+        const title = document.querySelector(`.doc-item[data-id="${currentId}"] .doc-item-title`);
+        if (title) title.textContent = d.title;
+      } else {
+        saveText.textContent = 'Не удалось сохранить';
+      }
+    }, 600);
+  }
+  editor.addEventListener('input', triggerAutoSave);
+  titleInput.addEventListener('input', triggerAutoSave);
+
+  // ---------- Маркер ----------
+  $('btn-highlight').addEventListener('click', () => {
+    const sel = window.getSelection();
+    if (!sel.rangeCount || sel.isCollapsed) return;
+    const range = sel.getRangeAt(0);
+    if (!editor.contains(range.commonAncestorContainer)) return;
+    const span = document.createElement('span');
+    span.className = 'highlight-pen';
+    span.appendChild(range.extractContents());
+    range.insertNode(span);
+    sel.removeAllRanges();
+    triggerAutoSave();
+  });
+  $('btn-clear-highlight').addEventListener('click', () => {
+    editor.querySelectorAll('.highlight-pen').forEach(span => {
+      span.parentNode.replaceChild(document.createTextNode(span.textContent), span);
+    });
+    triggerAutoSave();
+  });
+
+  // ---------- Новый документ / поиск ----------
+  $('new-doc-btn').addEventListener('click', () => {
+    const id = Math.max(0, ...docs.map(d => d.id)) + 1;
+    docs.unshift({ id, title: 'Новый конспект', category: 'Новый документ', updated: 'Только что',
+      content: "Начните писать и выделять <span class='highlight-pen'>главные мысли</span> маркером..." });
+    save('highlightse_docs_v1', docs);
+    openDoc(id);
+  });
+  $('doc-search').addEventListener('input', renderDocList);
+
+  // ---------- Кабинет учителя ----------
+  function renderSubs() {
+    $('sub-counter').textContent = subs.length;
+    grid.innerHTML = '';
+    subs.forEach(s => {
+      const card = document.createElement('div');
+      card.className = 'submission-card card-3d';
+      card.setAttribute('data-tilt', '');
+      const done = s.status === 'Проверено';
+      card.innerHTML = `
+        <div class="sub-top">
+          <div class="student-info">
+            <span class="student-avatar">${s.avatar}</span>
+            <div><h4>${esc(s.student)}</h4><span class="sub-time">${esc(s.submitted_at)}</span></div>
+          </div>
+          <span class="status-pill ${done ? 'status-done' : 'status-pending'}">${esc(s.status)}</span>
+        </div>
+        <h3 class="sub-title">${esc(s.title)}</h3>
+        <div class="sub-preview">${s.excerpt}</div>
+        <div class="sub-footer">
+          <span class="grade-label">Оценка:</span>
+          <div class="grade-buttons">
+            ${['5','4','3'].map(g => `<button class="btn-grade ${s.grade === g ? 'selected' : ''}" data-grade="${g}">${g}</button>`).join('')}
+          </div>
+        </div>`;
+      card.querySelectorAll('.btn-grade').forEach(b => b.addEventListener('click', () => {
+        s.grade = b.dataset.grade; s.status = 'Проверено';
+        save('highlightse_subs_v1', subs);
+        renderSubs();
+      }));
+      bindTilt(card);
+      grid.appendChild(card);
+    });
+  }
+
+  // ---------- Вкладки и маршрутизация ----------
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const sections = document.querySelectorAll('.view-section');
+  function switchTab(id) {
+    tabBtns.forEach(b => b.classList.toggle('active', b.dataset.target === id));
+    sections.forEach(s => s.classList.toggle('active', s.id === id));
+  }
+  tabBtns.forEach(b => b.addEventListener('click', () => switchTab(b.dataset.target)));
+
+  function route() {
+    const h = location.hash;
+    const inApp = h === '#app' || h === '#teacher';
+    $('page-landing').classList.toggle('active', !inApp);
+    $('page-app').classList.toggle('active', inApp);
+    document.body.classList.toggle('landing-body', !inApp);
+    if (inApp) switchTab(h === '#teacher' ? 'teacher-view' : 'workspace-view');
+    window.scrollTo(0, 0);
+  }
+  window.addEventListener('hashchange', route);
+
+  // ---------- Старт ----------
+  document.querySelectorAll('[data-tilt]').forEach(bindTilt);
+  renderDocList();
+  renderSubs();
+  if (currentId !== null) openDoc(currentId);
+  route();
+})();
+</script>
+</body>
+</html>
