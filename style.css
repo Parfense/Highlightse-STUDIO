@@ -49,7 +49,6 @@ body {
     pointer-events: none;
 }
 
-/* 🖍️ Выделитель с плавным фоном и округлёнными краями */
 .hl-marker {
     padding: 2px 9px;
     margin: 0 2px;
@@ -84,8 +83,6 @@ body {
     color: #4c0519 !important;
     box-shadow: 0 3px 10px rgba(251, 113, 133, 0.35);
 }
-
-/* ✅ КАСТОМНЫЕ ИНТЕРАКТИВНЫЕ SVG-ГАЛОЧКИ С УДАЛЕНИЕМ */
 .task-row {
     display: flex;
     align-items: center;
@@ -220,7 +217,6 @@ body {
 
 .pill-switch:hover { transform: scale(1.04); }
 
-/* ГЛАВНАЯ СТРАНИЦА ВХОДА */
 .auth-stage {
     max-width: 1160px;
     margin: 56px auto;
@@ -357,7 +353,6 @@ body {
     margin-bottom: 12px;
 }
 
-/* РАБОЧАЯ ОБЛАСТЬ WORD */
 .topbar-left, .topbar-right { display: flex; align-items: center; gap: 12px; }
 
 .sync-pill {
