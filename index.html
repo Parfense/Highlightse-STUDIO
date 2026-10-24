@@ -25,7 +25,6 @@
 
     <main class="auth-stage">
         <div class="auth-glass-panel">
-            <!-- Описание без паролей, подсказок и фейковых имён -->
             <div class="showcase-col">
                 <span class="tag-emerald">ТЕКСТОВЫЙ ПРОЦЕССОР</span>
                 <h1>Облачный редактор <span class="hl-marker hl-yellow">Highlightse Word</span></h1>
@@ -42,7 +41,6 @@
                 </div>
             </div>
 
-            <!-- Вход для ученика / Регистрация ученика / Преподаватель -->
             <div class="form-col">
                 <div class="segmented-tabs-3">
                     <button id="tab-student-login" class="seg-btn active" onclick="setAuthTab('student-login')">
@@ -70,8 +68,7 @@
                     </div>
                     <button type="submit" class="btn-action-3d">Войти как ученик</button>
                 </form>
-
-                <!-- 2. РЕГИСТРАЦИЯ УЧЕНИКА -->
+                
                 <form id="form-student-reg" class="glass-form" style="display:none;" onsubmit="handleRegister(event)">
                     <div class="form-title-box">
                         <h3>Регистрация ученика</h3>
@@ -98,7 +95,6 @@
                     <button type="submit" class="btn-action-3d">Зарегистрироваться и открыть Word</button>
                 </form>
 
-                <!-- 3. ВХОД ДЛЯ ПРЕПОДАВАТЕЛЯ -->
                 <form id="form-teacher-login" class="glass-form" style="display:none;" onsubmit="handleTeacherLogin(event)">
                     <div class="form-title-box">
                         <h3>Вход для преподавателя</h3>
