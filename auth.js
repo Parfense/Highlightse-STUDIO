@@ -1,4 +1,3 @@
-// АВТОНОМНАЯ БАЗА ДАННЫХ ДЛЯ GITHUB PAGES (LOCALSTORAGE) + 3D WEBGL THREE.JS
 const DB_KEY = 'highlightse_word_github_db_v1';
 const SESSION_KEY = 'highlightse_word_active_user';
 
@@ -35,8 +34,6 @@ function setActiveUser(user) {
     if (user) localStorage.setItem(SESSION_KEY, JSON.stringify(user));
     else localStorage.removeItem(SESSION_KEY);
 }
-
-// 3D WebGL сцена Three.js
 let scene, camera, renderer, crystals = [], mouseX = 0, mouseY = 0;
 
 function initThreeJS() {
@@ -197,8 +194,6 @@ function handleRegister(e) {
 
     const nextId = db.documents.reduce((max, d) => Math.max(max, d.id), 100) + 1;
     const nowTime = new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
-
-    // Абсолютно пустой белый лист А4 без каких-либо примеров текста
     db.documents.push({
         id: nextId,
         owner: un,
