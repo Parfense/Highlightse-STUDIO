@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Highlightse Word — Документы</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..700;1,400..700&family=Jost:ital,wght@0,400..700;1,400..700&family=Montserrat:wght@400;500;600;700;800&family=Roboto:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body class="word-app-page">
+    <canvas id="webgl-canvas"></canvas>
+
+    <header class="word-topbar">
+        <div class="topbar-left">
+            <a href="editor.html" class="brand">
+                <div class="brand-cube"></div>
+                <span>Highlightse <b>WORD</b></span>
+            </a>
+            <div id="save-status" class="sync-pill synced">
+                <span class="pulse-dot"></span>
+                <span id="save-label">Все изменения сохранены</span>
+            </div>
+        </div>
+
+        <div class="topbar-right">
+            <button class="btn-top btn-save" onclick="saveDoc(true)" title="Сохранить документ (Ctrl+S)">
+                💾 Сохранить
+            </button>
+            <button class="btn-top" onclick="exportToWord()" title="Скачать как файл Microsoft Word (.doc)">
+                📥 Скачать .DOC
+            </button>
+            <button class="btn-top" onclick="window.print()" title="Печать или сохранение в PDF">
+                🖨️ Печать / PDF
+            </button>
+
+            <button id="theme-toggle-btn" class="pill-switch" onclick="toggleTheme()" title="Переключить тему">
+                <span class="switch-label">🌙 / ☀️</span>
+            </button>
+
+            <div class="profile-badge">
+                <div class="avatar-circle" id="user-avatar-letter">U</div>
+                <div class="profile-info">
+                    <b id="user-fullname">Пользователь</b>
+                    <span id="user-meta-info">@user</span>
+                </div>
+                <a href="#" onclick="logoutUser(event)" class="logout-link" title="Выйти из профиля">Выйти</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="word-layout">
+        <!-- ЛЕВАЯ КОЛОНКА: БИБЛИОТЕКА ДОКУМЕНТОВ -->
+        <aside class="library-sidebar">
+            <div class="sidebar-head">
+                <h3>📚 Библиотека (<span id="doc-count">0</span>)</h3>
+                <button class="btn-create-doc" onclick="createNewDocument()">+ Новый лист</button>
+            </div>
+
+            <div class="sidebar-search">
+                <input type="text" id="lib-search" placeholder="🔍 Поиск..." oninput="filterDocs(this.value)">
+            </div>
+
+            <div id="doc-list" class="doc-cards-container"></div>
+        </aside>
+
+        <!-- ПРАВАЯ КОЛОНКА: ПАНЕЛЬ ИНСТРУМЕНТОВ WORD И ЧИСТЫЙ ЛИСТ А4 -->
+        <main class="editor-workspace">
+            <div class="word-ribbon-bar">
+                <div class="ribbon-row">
+                    <input type="text" id="doc-title" class="doc-title-field" value="Документ 1" placeholder="Название документа">
+
+                    <div class="ribbon-group">
+                        <label>Шрифт:</label>
+                        <select id="font-select" class="ribbon-select" onchange="changeFontFamily(this.value)">
+                            <option value="Helvetica">Helvetica</option>
+                            <option value="Futura">Futura</option>
+                            <option value="Roboto">Roboto</option>
+                            <option value="Montserrat" selected>Montserrat</option>
+                            <option value="Garamond">Garamond</option>
+                            <option value="Times New Roman">Times New Roman</option>
+                        </select>
+                    </div>
+
+                    <div class="ribbon-group size-slider-group">
+                        <label>Размер:</label>
+                        <input type="range" id="size-range" min="5" max="72" value="18" oninput="syncFontSize(this.value)">
+                        <input type="number" id="size-num" min="5" max="72" value="18" onchange="syncFontSize(this.value)">
+                        <span>px</span>
+                    </div>
+
+                    <div class="ribbon-group">
+                        <label>Интервал:</label>
+                        <select id="line-height-select" class="ribbon-select-sm" onchange="changeLineHeight(this.value)">
+                            <option value="1.15">1.15</option>
+                            <option value="1.5">1.5</option>
+                            <option value="1.75" selected>1.75</option>
+                            <option value="2.0">2.0</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="ribbon-row tools-row">
+                    <div class="btn-cluster">
+                        <button type="button" class="tool-icon-btn" onclick="cmd('bold')" title="Жирный (Ctrl+B)"><b>B</b></button>
+                        <button type="button" class="tool-icon-btn" onclick="cmd('italic')" title="Курсив (Ctrl+I)"><i>I</i></button>
+                        <button type="button" class="tool-icon-btn" onclick="cmd('underline')" title="Подчёркнутый (Ctrl+U)"><u>U</u></button>
+                        <button type="button" class="tool-icon-btn" onclick="cmd('strikeThrough')" title="Перечёркнутый"><s>S</s></button>
+                        <button type="button" class="tool-icon-btn" onclick="cmd('superscript')" title="Надстрочный индекс">X²</button>
+                        <button type="button" class="tool-icon-btn" onclick="cmd('subscript')" title="Подстрочный индекс">X₂</button>
+                    </div>
+
+                    <div class="v-sep"></div>
+
+                    <div class="btn-cluster">
+                        <button type="button" class="tool-icon-btn" onclick="cmd('justifyLeft')" title="По левому краю">⫷</button>
+                        <button type="button" class="tool-icon-btn" onclick="cmd('justifyCenter')" title="По центру">⫸</button>
+                        <button type="button" class="tool-icon-btn" onclick="cmd('justifyRight')" title="По правому краю">⫹</button>
+                        <button type="button" class="tool-icon-btn" onclick="cmd('justifyFull')" title="По ширине листа">▤</button>
+                        <button type="button" class="tool-icon-btn" onclick="cmd('insertUnorderedList')" title="Маркированный список">•≡</button>
+                        <button type="button" class="tool-icon-btn" onclick="cmd('insertOrderedList')" title="Нумерованный список">1≡</button>
+                    </div>
+
+                    <div class="v-sep"></div>
+
+                    <div class="btn-cluster highlighter-cluster">
+                        <button type="button" class="btn-marker-main" onclick="applyHighlight('hl-yellow')" title="Выделить плавным жёлтым маркером">
+                            🖍️ Выделитель
+                        </button>
+                        <button type="button" class="color-dot dot-yellow" onclick="applyHighlight('hl-yellow')" title="Жёлтый маркер"></button>
+                        <button type="button" class="color-dot dot-mint" onclick="applyHighlight('hl-mint')" title="Мятный маркер"></button>
+                        <button type="button" class="color-dot dot-cyan" onclick="applyHighlight('hl-cyan')" title="Бирюзовый маркер"></button>
+                        <button type="button" class="color-dot dot-coral" onclick="applyHighlight('hl-coral')" title="Коралловый маркер"></button>
+                        <button type="button" class="tool-icon-btn" onclick="clearSelectionFormat()" title="Стереть маркер и форматирование">🧹</button>
+                    </div>
+
+                    <div class="v-sep"></div>
+
+                    <div class="btn-cluster">
+                        <label class="color-picker-label" title="Цвет текста">
+                            🎨 Текст
+                            <input type="color" id="fore-color-picker" value="#064e3b" onchange="cmd('foreColor', this.value)">
+                        </label>
+                    </div>
+
+                    <div class="v-sep"></div>
+
+                    <button type="button" class="btn-insert-task" onclick="insertTaskCheckbox()">
+                        <span class="task-svg-icon">
+                            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </span>
+                        + Чек-бокс
+                    </button>
+                </div>
+            </div>
+
+            <!-- АБСОЛЮТНО ЧИСТЫЙ ЛИСТ А4 (КАК В ОБЫЧНОМ WORD) -->
+            <div class="canvas-viewport">
+                <div id="a4-sheet" class="a4-paper" contenteditable="true" data-id="1" data-font="Montserrat"><p><br></p></div>
+            </div>
+
+            <footer class="word-statusbar">
+                <div class="status-left">
+                    <span id="stat-words">Слов: 0</span>
+                    <span>•</span>
+                    <span id="stat-chars">Символов: 0</span>
+                    <span>•</span>
+                    <span id="stat-tasks">Отметок: 0/0</span>
+                </div>
+                <div class="status-right">
+                    <span>Масштаб листа: <b id="zoom-val">100%</b></span>
+                    <input type="range" id="zoom-slider" min="60" max="140" value="100" oninput="setPaperZoom(this.value)">
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <div id="word-toast" class="word-toast">💾 Сохранено!</div>
+
+    <script src="auth.js"></script>
+    <script src="editor.js"></script>
+</body>
+</html>

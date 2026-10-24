@@ -1,1 +1,119 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Highlightse Word — Вход</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..700;1,400..700&family=Jost:ital,wght@0,400..700;1,400..700&family=Montserrat:wght@400;600;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body class="landing-page">
+    <canvas id="webgl-canvas"></canvas>
 
+    <header class="top-bar">
+        <div class="brand">
+            <div class="brand-cube"></div>
+            <span>Highlightse <b>WORD</b></span>
+        </div>
+        <button id="theme-toggle-btn" class="pill-switch" onclick="toggleTheme()">
+            <span class="switch-label">🌙 Тёмная / ☀️ Светлая</span>
+        </button>
+    </header>
+
+    <main class="auth-stage">
+        <div class="auth-glass-panel">
+            <!-- Описание без паролей, подсказок и фейковых имён -->
+            <div class="showcase-col">
+                <span class="tag-emerald">ТЕКСТОВЫЙ ПРОЦЕССОР</span>
+                <h1>Облачный редактор <span class="hl-marker hl-yellow">Highlightse Word</span></h1>
+                <p class="subtitle">
+                    Чистое рабочее пространство для создания и оформления документов: 6 шрифтов, плавный размер от 5 до 72px, мягкий маркер со скруглёнными краями, интерактивные чек-листы и автосохранение.
+                </p>
+
+                <div class="feature-badges">
+                    <div class="f-badge">🖍️ Плавный жёлтый выделитель</div>
+                    <div class="f-badge">🔤 Helvetica, Futura, Roboto, Montserrat, Garamond, Times</div>
+                    <div class="f-badge">📏 Размер шрифта 5 – 72 px</div>
+                    <div class="f-badge">✅ Интерактивные галочки (с удалением)</div>
+                    <div class="f-badge">💾 Автосохранение и .DOC</div>
+                </div>
+            </div>
+
+            <!-- Вход для ученика / Регистрация ученика / Преподаватель -->
+            <div class="form-col">
+                <div class="segmented-tabs-3">
+                    <button id="tab-student-login" class="seg-btn active" onclick="setAuthTab('student-login')">
+                        👨‍🎓 Вход для ученика
+                    </button>
+                    <button id="tab-student-reg" class="seg-btn" onclick="setAuthTab('student-reg')">
+                        🌱 Регистрация ученика
+                    </button>
+                    <button id="tab-teacher-login" class="seg-btn" onclick="setAuthTab('teacher-login')">
+                        👨‍🏫 Преподаватель
+                    </button>
+                </div>
+
+                <div id="auth-error" class="error-banner" style="display:none;"></div>
+
+                <!-- 1. ВХОД ДЛЯ УЧЕНИКА -->
+                <form id="form-student-login" class="glass-form" onsubmit="handleStudentLogin(event)">
+                    <div class="form-title-box">
+                        <h3>Вход для ученика</h3>
+                        <p>Введите ваш логин, указанный при регистрации</p>
+                    </div>
+                    <div>
+                        <label class="field-label">Логин ученика</label>
+                        <input type="text" id="student-login-input" class="emerald-input" placeholder="Введите логин" required>
+                    </div>
+                    <button type="submit" class="btn-action-3d">Войти как ученик</button>
+                </form>
+
+                <!-- 2. РЕГИСТРАЦИЯ УЧЕНИКА -->
+                <form id="form-student-reg" class="glass-form" style="display:none;" onsubmit="handleRegister(event)">
+                    <div class="form-title-box">
+                        <h3>Регистрация ученика</h3>
+                        <p>Заполните анкету для создания личного кабинета</p>
+                    </div>
+                    <div class="grid-2">
+                        <div>
+                            <label class="field-label">Имя</label>
+                            <input type="text" id="reg-fn" class="emerald-input" placeholder="Имя" required>
+                        </div>
+                        <div>
+                            <label class="field-label">Фамилия</label>
+                            <input type="text" id="reg-ln" class="emerald-input" placeholder="Фамилия" required>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="field-label">Дата рождения</label>
+                        <input type="date" id="reg-dob" class="emerald-input" required>
+                    </div>
+                    <div>
+                        <label class="field-label">Логин</label>
+                        <input type="text" id="reg-un" class="emerald-input" placeholder="Придумайте логин" required>
+                    </div>
+                    <button type="submit" class="btn-action-3d">Зарегистрироваться и открыть Word</button>
+                </form>
+
+                <!-- 3. ВХОД ДЛЯ ПРЕПОДАВАТЕЛЯ -->
+                <form id="form-teacher-login" class="glass-form" style="display:none;" onsubmit="handleTeacherLogin(event)">
+                    <div class="form-title-box">
+                        <h3>Вход для преподавателя</h3>
+                        <p>Введите ваш рабочий логин</p>
+                    </div>
+                    <div>
+                        <label class="field-label">Логин преподавателя</label>
+                        <input type="text" id="teacher-login-input" class="emerald-input" placeholder="Введите логин" required>
+                    </div>
+                    <button type="submit" class="btn-action-3d">Войти в кабинет</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script src="auth.js"></script>
+</body>
+</html>
